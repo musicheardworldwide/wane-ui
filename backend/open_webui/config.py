@@ -690,7 +690,7 @@ if frontend_loader.exists():
 # CUSTOM_NAME (Legacy)
 ####################################
 
-CUSTOM_NAME = os.environ.get("CUSTOM_NAME", "")
+CUSTOM_NAME = os.environ.get("CUSTOM_NAME", "World of Sin")
 
 if CUSTOM_NAME:
     try:
@@ -719,7 +719,7 @@ if CUSTOM_NAME:
 
                 r = requests.get(url, stream=True)
                 if r.status_code == 200:
-                    with open(f"{STATIC_DIR}/splash.png", "wb") as f:
+                    with open(f"{STATIC_DIR}/logo.png", "wb") as f:
                         r.raw.decode_content = True
                         shutil.copyfileobj(r.raw, f)
 
@@ -857,10 +857,10 @@ ENABLE_OPENAI_API = PersistentConfig(
 )
 
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-OPENAI_API_BASE_URL = os.environ.get("OPENAI_API_BASE_URL", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "sk-7fd014d945684bf5b00c27c092d8866c")
+OPENAI_API_BASE_URL = os.environ.get("OPENAI_API_BASE_URL", "https://api.deepseek.com/v1")
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyB8NuwYcODSyVuoiZxSIv0ouiAxl2pNYV8")
 GEMINI_API_BASE_URL = os.environ.get("GEMINI_API_BASE_URL", "")
 
 
@@ -912,7 +912,255 @@ OPENAI_API_BASE_URL = "https://api.openai.com/v1"
 TOOL_SERVER_CONNECTIONS = PersistentConfig(
     "TOOL_SERVER_CONNECTIONS",
     "tool_server.connections",
-    [],
+    [
+        {
+            "name": "github.com/snaggle-ai/openapi-mcp-server",
+            "autoApprove": [
+                "getApiOverview",
+                "getApiOperation"
+            ],
+            "disabled": False,
+            "timeout": 60,
+            "command": "/usr/bin/node",
+            "args": [
+                "/home/wesmane/.npm/_npx/689a2b38d325547c/node_modules/openapi-mcp-server/index.js",
+                "run"
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "github.com/NightTrek/Software-planning-mcp",
+            "autoApprove": [
+                "start_planning",
+                "add_todo",
+                "get_todos",
+                "update_todo_status",
+                "save_plan",
+                "remove_todo"
+            ],
+            "timeout": 60,
+            "command": "node",
+            "args": [
+                "/home/wesmane/Documents/Cline/MCP/Software-planning-mcp/build/index.js"
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "filesystem",
+            "autoApprove": [
+                "read_file",
+                "read_multiple_files",
+                "write_file",
+                "edit_file",
+                "create_directory",
+                "list_directory",
+                "directory_tree",
+                "move_file",
+                "search_files",
+                "get_file_info",
+                "list_allowed_directories"
+            ],
+            "timeout": 60,
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "mcp/filesystem",
+                "."
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "basic-memory",
+            "autoApprove": [
+                "delete_note",
+                "read_content",
+                "build_context",
+                "recent_activity",
+                "search_notes",
+                "read_note",
+                "write_note",
+                "canvas",
+                "project_info"
+            ],
+            "timeout": 60,
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "mcp/basic-memory"
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "github",
+            "autoApprove": [
+                "create_or_update_file",
+                "search_repositories",
+                "create_repository",
+                "push_files",
+                "create_issue",
+                "create_pull_request",
+                "fork_repository",
+                "create_branch",
+                "list_commits",
+                "list_issues",
+                "update_issue",
+                "add_issue_comment",
+                "search_code",
+                "search_issues",
+                "search_users",
+                "get_issue",
+                "get_pull_request",
+                "list_pull_requests",
+                "create_pull_request_review",
+                "merge_pull_request",
+                "get_pull_request_files",
+                "get_pull_request_status",
+                "update_pull_request_branch",
+                "get_pull_request_comments",
+                "get_pull_request_reviews",
+                "list_repositories",
+                "get_file_contents"
+            ],
+            "timeout": 60,
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-e",
+                "GITHUB_PERSONAL_ACCESS_TOKEN=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",
+                "mcp/github"
+            ],
+            "env": {
+                "HOME": "/home/wesmane"
+            },
+            "transportType": "stdio"
+        },
+        {
+            "name": "sequentialthinking",
+            "autoApprove": [
+                "sequentialthinking"
+            ],
+            "timeout": 60,
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "mcp/sequentialthinking"
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "github.com/pashpashpash/mcp-taskmanager",
+            "autoApprove": [
+                "request_planning",
+                "get_next_task",
+                "mark_task_done",
+                "approve_task_completion",
+                "approve_request_completion",
+                "open_task_details",
+                "list_requests",
+                "add_tasks_to_request",
+                "update_task",
+                "delete_task"
+            ],
+            "timeout": 60,
+            "command": "node",
+            "args": [
+                "/home/wesmane/Documents/Cline/MCP/mcp-taskmanager/dist/index.js"
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "github.com/NightTrek/Ollama-mcp",
+            "autoApprove": [
+                "list",
+                "serve",
+                "create",
+                "show",
+                "run",
+                "pull",
+                "push",
+                "cp",
+                "rm",
+                "chat_completion"
+            ],
+            "timeout": 60,
+            "command": "node",
+            "args": [
+                "/home/wesmane/Documents/Cline/MCP/Ollama-mcp/build/index.js"
+            ],
+            "env": {
+                "HOME": "/home/wesmane"
+            },
+            "transportType": "stdio"
+        },
+        {
+            "name": "github.com/modelcontextprotocol/servers/tree/main/src/memory",
+            "autoApprove": [
+                "create_entities",
+                "create_relations",
+                "add_observations",
+                "delete_entities",
+                "delete_observations",
+                "delete_relations",
+                "read_graph",
+                "search_nodes",
+                "open_nodes"
+            ],
+            "disabled": False,
+            "timeout": 60,
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "-v",
+                "claude-memory:/app/dist",
+                "--rm",
+                "mcp/memory"
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "@21st-dev/magic",
+            "autoApprove": [
+                "21st_magic_component_builder",
+                "logo_search",
+                "21st_magic_component_inspiration",
+                "21st_magic_component_refiner"
+            ],
+            "timeout": 60,
+            "command": "npx",
+            "args": [
+                "-y",
+                "@21st-dev/magic@latest",
+                "API_KEY=\"05e7b2134a7da6f9c8f6e6f95085cb3b98c6786ae953fda45867d38a45977e3c\""
+            ],
+            "transportType": "stdio"
+        },
+        {
+            "name": "console-ninja",
+            "autoApprove": [
+                "runtime-errors",
+                "runtime-logs",
+                "runtime-logs-by-location",
+                "runtime-logs-and-errors"
+            ],
+            "timeout": 60,
+            "command": "npx",
+            "args": [
+                "-y",
+                "-c",
+                "node ~/.console-ninja/mcp/"
+            ],
+            "transportType": "stdio"
+        }
+    ],
 )
 
 ####################################
