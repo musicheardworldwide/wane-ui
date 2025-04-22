@@ -1,12 +1,12 @@
 services:
-  ollama:
-    volumes:
-      - ollama:/root/.ollama
-    container_name: ollama
-    pull_policy: always
-    tty: true
-    restart: unless-stopped
-    image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
+  # ollama:
+  #   volumes:
+  #     - ollama:/root/.ollama
+  #   container_name: ollama
+  #   pull_policy: always
+  #   tty: true
+  #   restart: unless-stopped
+  #   image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
 
   open-webui:
     build:
@@ -18,17 +18,64 @@ services:
     container_name: open-webui
     volumes:
       - open-webui:/app/backend/data
-    depends_on:
-      - ollama
     ports:
       - ${OPEN_WEBUI_PORT-3000}:8080
     environment:
       - 'OLLAMA_BASE_URL=http://ollama:11434'
       - 'WEBUI_SECRET_KEY='
+      - 'ENABLE_IMAGE_GENERATION=true'
+      - 'AUTOMATIC1111_BASE_URL=http://stable-diffusion-webui:7860'
+      - 'IMAGE_SIZE=64x64'
+      - 'IMAGE_STEPS=3'
+      - 'WEB_LOADER_ENGINE=playwright'
+      - 'PLAYWRIGHT_WS_URL=ws://playwright:3000'
     extra_hosts:
       - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+  jupyter:
+    image: jupyter/minimal-notebook:latest
+    container_name: jupyter-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - jupyter_data:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=123456
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+  # stable-diffusion-webui:
+  #   # Not built for ARM64
+  #   platform: linux/amd64
+  #   image: ghcr.io/neggles/sd-webui-docker:latest
+  #   restart: unless-stopped
+  #   environment:
+  #     CLI_ARGS: "--api --use-cpu all --precision full --no-half --skip-torch-cuda-test --ckpt /empty.pt --do-not-download-clip --disable-nan-check --disable-opt-split-attention"
+  #     PYTHONUNBUFFERED: "1"
+  #     TERM: "vt100"
+  #     SD_WEBUI_VARIANT: "default"
+  #   # Hack to get container working on Apple Silicon
+  #   # Rosetta creates a conflict ${HOME}/.cache folder
+  #   entrypoint: /bin/bash
+  #   command:
+  #     - -c
+  #     - |
+  #       export HOME=/root-home
+  #       rm -rf $${HOME}/.cache
+  #       /docker/entrypoint.sh python -u webui.py --listen --port $${WEBUI_PORT} --skip-version-check $${CLI_ARGS}
+  #   volumes:
+  #     - ./test/test_files/image_gen/sd-empty.pt:/empty.pt
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.49.1-noble # Version must match requirements.txt
+    container_name: playwright
+    command: npx -y playwright@1.49.1 run-server --port 3000 --host 0.0.0.0
     restart: unless-stopped
 
 volumes:
   ollama: {}
   open-webui: {}
+  jupyter_data: {}
